@@ -1,0 +1,14 @@
+[
+    {
+      "modeName"      : "chat",
+      "displayName"   : "conversation with bot",
+      "description"   : "chat with LLM chatbot",
+      "id"            : "0"
+    },
+    {
+      "modeName"      : "knowledge",
+      "displayName"   : "query to knowledge base",
+      "description"   : "search chunks from vector database",
+      "id"            : "1"
+    }
+]

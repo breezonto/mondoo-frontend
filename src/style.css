@@ -1,0 +1,96 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 主题相关变量 - 主要用于导航栏 */
+:root {
+  /* 深色主题 */
+  --sidebar-bg-dark: #27293d;
+  --sidebar-text-dark: rgba(255, 255, 255, 0.7);
+  --sidebar-hover-dark: #36395a;
+  --header-bg-dark: #27293d;
+  --header-text-dark: #ffffff;
+  --logout-btn-dark: #646cff;
+  
+  /* 浅色主题 */
+  --sidebar-bg-light: #f8f9fa;
+  --sidebar-text-light: rgba(0, 0, 0, 0.7);
+  --sidebar-hover-light: #e9ecef;
+  --header-bg-light: #f8f9fa;
+  --header-text-light: #212529;
+  --logout-btn-light: #007bff;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.card {
+  padding: 2em;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}

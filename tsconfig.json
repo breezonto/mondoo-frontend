@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "types": ["node"], // 确保包含 "node"
+    "typeRoots": ["node_modules/@types"] // 确保类型根目录正确指向 node_modules/@types
+  }
+}

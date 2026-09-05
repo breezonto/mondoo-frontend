@@ -1,0 +1,49 @@
+[
+  {
+    "path": "/",
+    "component": "MainLayout",
+    "meta": { "requiresAuth": true },
+
+    "children": [
+      {
+        "path": "/espacio",
+        "name": "espacio",
+        "component": "AgentView",
+        "meta": {
+          "title": "Main Page"
+        }
+      },
+
+      {
+        "path": "/library",
+        "name": "files",
+        "component": "FileListView",
+        "meta": {
+          "title": "Library"
+        }
+      },
+
+      {
+        "path": "/menu",
+        "name": "menu",
+        "component": "MenuListView",
+        "meta": {
+          "title": "Menu"
+        }
+      },
+
+      {
+        "path": "/history/manage",
+        "name": "message history",
+        "component": "HistoryListView",
+        "meta": {
+          "title": "Message History"
+        }
+      }
+    ]
+  },
+  {
+    "path": "",
+    "redirect": "/espacio"
+  }
+]
