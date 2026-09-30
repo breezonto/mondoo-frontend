@@ -1,98 +1,6 @@
-<template>
-  <div class="app-container">
-    <!-- Sidebar -->
-    <Sidebar 
-      :isOpen="rIsSidebarOpen" 
-      @close="onCloseSidebar"
-    />
-    
-    <!-- Main Area -->
-    <main class="content">
-      <!-- Topbar -->
-      <div class="top-bar">
-        <button class="hamburger-btn" @click="onToggleSidebar">☰</button>
-        <div class="title-area">
-          <h1 class="main-title">{{ currentTitle }}</h1>
-          <span class="version-text" v-if="rVersion"> v{{ rVersion }}</span>
-        </div>
-        
-        <div class="header-right">
-          <div class="user-info-wrapper" ref="userInfoWrapperRef">
-            <span class="user-name" @click="onOpenUserInfoSettings">{{ currentNickname }}</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Contet -->
-      <div class="page-content">
-        <RouterView />
-      </div>
-    </main>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
-import Sidebar from '@/views/floating/Sidebar.vue';
-import { formatDateTime } from '@/utils/formatter';
-
-const route  = useRoute();
-
-const rIsSidebarOpen = ref(false);
-const rVersion       = ref('');
-
-
-const currentNickname = computed(() => {
-  return "Hero";
-});
-
-
-const currentTitle = computed(() => {
-  const path = route.path;
-  if (path.includes('/files')) {
-    return 'Library';
-  }
-  else {
-    return 'Inicio';
-  }
-});
-
-
-const onToggleSidebar = () => {
-  rIsSidebarOpen.value = !rIsSidebarOpen.value;
-};
-
-
-const onOpenUserInfoSettings = () => {
-  console.log("Jump to User Info Page!");
-};
-
-const onCloseSidebar = () => {
-  rIsSidebarOpen.value = false;
-};
-
-
-watch(() => route.path, () => {
-  rIsSidebarOpen.value = false;
-});
-
-
-onMounted(async () => {
-  console.log("MainLayout Mounted!!!");
-  try {
-    rVersion.value = "0.1"
-  } catch (e) {
-    console.warn('Failed to Get Version Number:', e);
-  }
-});
-
-
-onUnmounted(() => {
-
-});
-</script>
+////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// css style config ////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 
 <style scoped>
 .app-container {
@@ -183,7 +91,7 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.user-name {
+.default-btn {
   font-size: 14px;
   color: #333;
   font-weight: 500;
@@ -196,7 +104,7 @@ onUnmounted(() => {
   display: inline-block;
 }
 
-.user-name:hover {
+.default-btn:hover {
   border-color: #d0d0d0;
   background-color: #f5f5f5;
 }
@@ -667,3 +575,108 @@ onUnmounted(() => {
   min-height: 0;
 }
 </style>
+
+
+<template>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <Sidebar 
+      :isOpen="rIsSidebarOpen" 
+      @close="onCloseSidebar"
+    />
+    
+    <!-- Main Area -->
+    <main class="content">
+      <!-- Topbar -->
+      <div class="top-bar">
+        <button class="hamburger-btn" @click="onToggleSidebar">☰</button>
+        <div class="title-area">
+          <h1 class="main-title">{{ currentTitle }}</h1>
+          <span class="version-text" v-if="rVersion"> v{{ rVersion }}</span>
+        </div>
+        
+        <div class="header-right">
+          <div class="user-info-wrapper" ref="userInfoWrapperRef">
+            <span class="default-btn" @click="onOpenLibrary"> Library </span>
+          </div>
+          <div class="user-info-wrapper" ref="userInfoWrapperRef">
+            <span class="default-btn" @click="onOpenUserInfoSettings">{{ currentNickname }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contet -->
+      <div class="page-content">
+        <RouterView />
+      </div>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import Sidebar from '@/views/floating/Sidebar.vue';
+import { formatDateTime } from '@/utils/formatter';
+
+const router = useRouter();
+const route  = useRoute();
+
+const rIsSidebarOpen = ref(false);
+const rVersion       = ref('');
+
+
+const currentNickname = computed(() => {
+  return "Hero";
+});
+
+
+const currentTitle = computed(() => {
+  const path = route.path;
+  if (path.includes('/files')) {
+    return 'Library';
+  }
+  else {
+    return 'Inicio';
+  }
+});
+
+
+const onToggleSidebar = () => {
+  rIsSidebarOpen.value = !rIsSidebarOpen.value;
+};
+
+
+const onOpenUserInfoSettings = () => {
+  console.log("Jump to User Info Page!");
+};
+
+const onOpenLibrary = () => {
+  router.push({path  : '/library'});
+};
+
+const onCloseSidebar = () => {
+  rIsSidebarOpen.value = false;
+};
+
+
+watch(() => route.path, () => {
+  rIsSidebarOpen.value = false;
+});
+
+
+onMounted(async () => {
+  console.log("MainLayout Mounted!!!");
+  try {
+    rVersion.value = "0.1"
+  } catch (e) {
+    console.warn('Failed to Get Version Number:', e);
+  }
+});
+
+
+onUnmounted(() => {
+
+});
+</script>
