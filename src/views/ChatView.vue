@@ -1,68 +1,6 @@
-<template>
-  <div class="chat-view">
-    <div class="chat-section">
-      <div class="chat-container" ref="chatContainer">
-        <div class="message" v-for="(message, index) in rDisplayMessages" 
-          :key   = "index"
-          :class = "message.role"
-        >
-          <div class="avatar">
-            {{avatars_list[message.role]}}
-          </div>
-          
-          <div class="message-content">
-            <div class="bubble" v-html="processedMessages[index]?.content || message.content"
-              @click="onClickBubble" 
-            >
-            </div>
-            <div class="message-meta">
-              <span class="copy-btn" title="copy" @click="onCopyMessage(message.content)">📋</span>
-              <span class="chat-type-label" v-if="message.modeName != null">
-                {{ getChatModeDisplayName(message.modeName) }}
-              </span>
-              <span class="msg-time" v-if="message.time">
-                {{ message.time }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div v-if="rIsLoading" class="message ai">
-          <div class="avatar">🤖</div>
-          <div class="bubble">Thinking...</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="input-section">
-      <div class="input-container">
-        <div class="input-wrapper">
-          <textarea 
-                :value="rCurrInputMsg" 
-                @input="(e) => {
-                  rCurrInputMsg = (e.target as HTMLTextAreaElement).value;
-                  onAdjustTextareaHeight(e);
-                }"
-                @keydown.enter="onEnterKeyDown"
-                placeholder="Typing here..."
-                :style="{ height: textareaHeight + 'px' }">
-          </textarea>
-          <button class="send-btn" 
-              :disabled="!rCurrInputMsg.trim()" 
-              @click="onSendMessage">
-          Send
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// css style config ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
-
-
 <style scoped>
 .chat-view {
   height: 100%;
@@ -366,30 +304,20 @@
   flex-shrink: 0;
 }
 
-.input-section {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-
-  transform: translateX(-50%);
-
-  width: min(840px, calc(100% - 40px));
-
-  padding: 20px;
-  background: transparent;
-  border: none;
-  box-sizing: border-box;
-
-  z-index: 10;
-}
-
-.input-container {
-  max-width: 800px;
-  margin: 0 auto;
+.input-area {
+  transform : translateX(-50%);
+  position  : absolute;
+  left      : 50%;
+  bottom    : 5%;
+  width     : min(840px, calc(100% - 40px));
+  
+  margin    : 0 auto;
+  
   background-color: #f5f6f5;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 16px;
+  
+  border-radius : 8px;
+  box-shadow    : 0 5px 8px rgba(0, 0, 0, 0.1);
+  padding       : 16px;
 }
 
 .input-wrapper {
@@ -405,17 +333,16 @@
 }
 
 textarea {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  padding: 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  resize: none;
-  overflow: hidden;
-  font-family: inherit;
-  transition: border-color 0.3s;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    line-height: 1.5;
+    resize: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: inherit;
+    transition: border-color 0.3s;
 }
 
 textarea:focus {
@@ -468,23 +395,6 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
-#send-btn {
-  padding: 8px 20px;
-  background-color: #1890ff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  min-width: 80px;
-
-  flex: 0 0 auto;
-  width: 80px;
-  height: 40px;
-  padding: 8px 20px;
-}
-
 
 .send-btn {
   min-width: 60px;
@@ -507,110 +417,69 @@ textarea:focus {
   /* Move to bottom of the flex container */
   align-self: flex-end;
 }
-
-
-#send-btn:hover:not(:disabled) {
-  background-color: #40a9ff;
-}
-
-#send-btn:disabled {
-  background-color: #a0cfff;
-  cursor: not-allowed;
-}
-
-/* 响应式设计 - 适配手机端 */
-@media (max-width: 768px) {
-  /* 消息气泡在手机端占据更大宽度 */
-  .message {
-    max-width: 75%;
-  }
-  
-  .chat-section {
-    min-height: 0;
-  }
-
-  /* 聊天容器减少内边距 */
-  .chat-container {
-    flex: 1;
-    min-height: 0;
-    padding: 12px 12px 70px;
-  }
-  
-  /* 输入区域布局调整 */
-  .input-actions {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-    width: 100%;
-  }
-  
-  .input-type-selector {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    font-size: 12px;
-    overflow: hidden;
-  }
-  
-  .input-type-selector label {
-    font-size: 11px;
-    white-space: nowrap;
-    margin-right: 4px;
-    flex-shrink: 0;
-  }
-  
-  .input-type-select {
-    flex: 1;
-    width: 0;
-    max-width: calc(100% - 70px);
-    font-size: 11px;
-    padding: 4px 6px;
-    box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  #send-btn {
-    width: auto;
-    min-width: 60px;
-    font-size: 12px;
-    padding: 4px 8px;
-    flex-shrink: 0;
-  }
-  
-  /* 输入容器调整 */
-  .input-container {
-    width: 100%;
-    max-width: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  /* 输入区域整体调整 */
-  .input-section {
-    padding: 12px 16px;
-    margin: 0;
-  }
-  
-  /* 确保输入框与输入区域间距一致 */
-  textarea {
-    margin: 0;
-    padding: 12px;
-  }
-  
-  /* 确保输入区域内所有元素的左右间距一致 */
-  .input-section > * {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  
-  .input-wrapper {
-    padding: 0;
-    margin: 0;
-  }
-}
 </style>
+
+<template>
+  <div class="chat-view">
+    <div class="chat-section">
+      <div class="chat-container" ref="chatContainer">
+        <div class="message" v-for="(message, index) in rDisplayMessages" 
+          :key   = "index"
+          :class = "message.role"
+        >
+          <div class="avatar">
+            {{avatars_list[message.role]}}
+          </div>
+          
+          <div class="message-content">
+            <div class="bubble" v-html="processedMessages[index]?.content || message.content"
+              @click="onClickBubble" 
+            >
+            </div>
+            <div class="message-meta">
+              <span class="copy-btn" title="copy" @click="onCopyMessage(message.content)">📋</span>
+              <span class="chat-type-label" v-if="message.modeName != null">
+                {{ getChatModeDisplayName(message.modeName) }}
+              </span>
+              <span class="msg-time" v-if="message.time">
+                {{ message.time }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div v-if="rIsLoading" class="message ai">
+          <div class="avatar">🤖</div>
+          <div class="bubble">Thinking...</div>
+        </div>
+      </div>
+    </div>
+
+    <InputBox
+      @send-message="_forwardRound"
+    />
+    <!--
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea 
+              :value="rCurrInputMsg" 
+              @input="(e) => {
+                rCurrInputMsg = (e.target as HTMLTextAreaElement).value;
+                onAdjustTextareaHeight(e);
+              }"
+              placeholder="Typing here..."
+              :style="{ height: textareaHeight + 'px' }">
+        </textarea>
+        <button 
+          class="send-btn" 
+          :disabled="!rCurrInputMsg.trim()" 
+          @keydown.enter="onEnterKeyDown"
+          @click="onSendMessage">Send
+        </button>
+      </div>
+    </div>
+    -->
+  </div>
+</template>
 
 
 <script setup lang="ts">
@@ -622,6 +491,8 @@ import eventBus from '@/utils/eventBus';
 import { generateChatCompletion }          from '@/api/chat.ts';
 import { formatMsgTime, formatMessageContent } from '@/utils/formatter.ts';
 import type { QueryMode, }    from '@/cxtmgr/session.ts';
+import InputBox from './gadgets/InputBox.vue';
+
 
 import { 
   Session,
@@ -646,6 +517,11 @@ const emit = defineEmits<{
 const chatContainer     = ref<HTMLElement | null>(null);
 const processedMessages = ref<Array<{ content: string }>>([]);
 
+const MIN_TEXTAREA_HEIGHT = 75;
+const MAX_TEXTAREA_HEIGHT = 400;
+
+const textareaHeight = ref(MIN_TEXTAREA_HEIGHT);
+
 const rCurrSession     = ref<Session>();
 const rCurrMsgIdx      = ref<number>(0);
 const rCurrInputMsg    = ref("");
@@ -661,7 +537,6 @@ const props = defineProps<{
   currQueryMode    : string,
   currMsgContent   : string,
   currMsgHistoryId : string,
-  textareaHeight   : number;
 }>();
 
 
@@ -792,14 +667,17 @@ const _displayStreamingMessage = async (
 /**
  * 
  */
-const _forwardRound = async () => {
-  if (!rCurrInputMsg.value) return;
-  
+const _forwardRound = async (currMessage : string) => {
+  // if (!rCurrInputMsg.value) return;
+  if (!currMessage) return;
+
   console.log(
-    "Current User Query:", rCurrInputMsg.value
+    // "Current User Query:", rCurrInputMsg.value
+    "Current User Query:", currMessage
   )
 
-  const query_message = rCurrInputMsg.value;
+  // const query_message = rCurrInputMsg.value;
+  const query_message = currMessage;
 
   _createBubble(
     query_message, 
@@ -813,7 +691,7 @@ const _forwardRound = async () => {
     query_message
   )
 
-  rCurrInputMsg.value = '';
+  // rCurrInputMsg.value = '';
 
   _createBubble(
     "", 
@@ -901,16 +779,27 @@ const handleClickBubble = (e: MouseEvent) => {
  * @param e 
  */
 const onAdjustTextareaHeight = (e: Event) => {
-  emit('adjustTextareaHeight', e);
+  const textarea = e.target as HTMLTextAreaElement;
+
+  // Temporarily reset so scrollHeight represents the actual content height
+  textarea.style.height = `${MIN_TEXTAREA_HEIGHT}px`;
+
+  const contentHeight = textarea.scrollHeight;
+
+  // Don't change height until content actually needs more space
+  textareaHeight.value = Math.max(
+    MIN_TEXTAREA_HEIGHT,
+    Math.min(contentHeight, MAX_TEXTAREA_HEIGHT)
+  );
 };
 
 
 /**
  * @TODO comment
  */
-const onSendMessage = async () => {
-  await _forwardRound()
-};
+// const onSendMessage = async () => {
+//   await _forwardRound()
+// };
 
 
 /**
@@ -926,13 +815,13 @@ const onClickBubble = (e: MouseEvent) => {
  * @TODO comment
  * @param e 
  */
-const onEnterKeyDown = (e: KeyboardEvent) => {
+// const onEnterKeyDown = (e: KeyboardEvent) => {
   // emit('handleEnterKey', event);
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    rCurrInputMsg.value.trim() && onSendMessage();
-  }
-};
+//   if (e.key === 'Enter' && !e.shiftKey) {
+//     e.preventDefault();
+//     rCurrInputMsg.value.trim() && onSendMessage();
+//   }
+// };
 
 
 /**
@@ -1004,7 +893,7 @@ const promptChat = async (
   
   if (data) {
     await _prepareConversation(data.queryMode, data.message.trim())
-    await _forwardRound();
+    await _forwardRound(data.message);
   }
 
   eventBus.triggerSessionSent();

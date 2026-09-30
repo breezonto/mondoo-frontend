@@ -9,8 +9,6 @@
       :curr-query-mode="rCurrQueryMode"
       :curr-msg-history-id="rCurrMsgHistoryId"
       :curr-msg-content="rCurrMsgContent"
-      :textarea-height="rTextareaHeight"
-      @adjust-textarea-height="onAdjustTextareaHeight"
       @open-file-link="onOpenFileLink"
     />
 
@@ -48,7 +46,6 @@ const router = useRouter();
 ////////////////////////////////////////////////////////////////////////////////////
 
 const rIsLoading        = ref(false);
-const rTextareaHeight   = ref(60);
 const rCurrQueryMode    = ref('')
 const rShowWelcome      = ref(true);
 const rCurrMsgHistoryId = ref<string>("");
@@ -61,8 +58,6 @@ const rPreviewLoading       = ref(false);
 const rCurrentPreviewFileId = ref('');
 const rCurrentMsgIdx        = ref<number | null>(null);
 
-
-const maxTextareaHeight : number = 200;
 const historyIdPrefix   : string = "cmh-";
 
 
@@ -96,17 +91,6 @@ const _closePreviewModal = () => {
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Below event functions /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
-
-
-/**
- * 
- * @param event 
- */
-const onAdjustTextareaHeight = (event: Event) => {
-  const textarea = event.target as HTMLTextAreaElement;
-  textarea.style.height = 'auto';
-  rTextareaHeight.value = Math.min(textarea.scrollHeight, maxTextareaHeight);
-};
 
 
 /**
