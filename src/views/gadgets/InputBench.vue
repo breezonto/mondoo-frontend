@@ -74,9 +74,9 @@ textarea:focus {
     <div class="input-area">
         <div class="input-wrapper">
             <textarea 
-                :value="rCurrInputMsg" 
+                :value="rCurrInput" 
                 @input="(e) => {
-                    rCurrInputMsg = (e.target as HTMLTextAreaElement).value; 
+                    rCurrInput = (e.target as HTMLTextAreaElement).value; 
                     onAdjustTextareaHeight(e);
                 }"
                 @keydown.enter = "onEnterKeyDown"
@@ -85,7 +85,7 @@ textarea:focus {
             </textarea>
             <button 
                 class="send-btn" 
-                :disabled="!rCurrInputMsg.trim()" 
+                :disabled="!rCurrInput.trim()" 
                 @click         = "onSendMessage">Send
             </button>
         </div>
@@ -100,7 +100,7 @@ const MIN_TEXTAREA_HEIGHT = 75;
 const MAX_TEXTAREA_HEIGHT = 400;
 
 const rTextareaHeight = ref(MIN_TEXTAREA_HEIGHT);
-const rCurrInputMsg  = ref("");
+const rCurrInput  = ref("");
 
 const emit = defineEmits<{
  (e: 'sendMessage', message: string): void;
@@ -134,7 +134,7 @@ const onEnterKeyDown = async (e: KeyboardEvent) => {
 };
 
 const onSendMessage = async () => {
-   rCurrInputMsg.value.trim() && emit("sendMessage", rCurrInputMsg.value);
+   rCurrInput.value.trim() && emit("sendMessage", rCurrInput.value);
 };
 
 </script>

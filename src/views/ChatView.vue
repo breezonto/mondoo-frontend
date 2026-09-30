@@ -454,7 +454,7 @@ textarea:focus {
       </div>
     </div>
 
-    <InputBox
+    <InputBench
       @send-message="_forwardRound"
     />
     <!--
@@ -491,7 +491,6 @@ import eventBus from '@/utils/eventBus';
 import { generateChatCompletion }          from '@/api/chat.ts';
 import { formatMsgTime, formatMessageContent } from '@/utils/formatter.ts';
 import type { QueryMode, }    from '@/cxtmgr/session.ts';
-import InputBox from './gadgets/InputBox.vue';
 
 
 import { 
@@ -502,6 +501,7 @@ import {
   loadChatHistory 
 }
 from '@/cxtmgr/session.ts';
+import InputBench from './gadgets/InputBench.vue';
 
 
 ////////////////////////////////////////////////////////////////////////////////////
