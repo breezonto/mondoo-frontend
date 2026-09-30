@@ -626,18 +626,10 @@ const route  = useRoute();
 const rIsSidebarOpen = ref(false);
 const rVersion       = ref('');
 
-
 const currentNickname = computed(() => { return "Hero"; });
 
-
 const currentTitle = computed(() => {
-  const path = route.path;
-  if (path.includes('/files')) {
-    return 'Library';
-  }
-  else {
-    return 'Inicio';
-  }
+  return 'MONDOO';
 });
 
 
