@@ -2,7 +2,6 @@
   <div class="welcome-container">
     <div class="welcome-content">
       <h1 class="welcome-title">Mondooooo</h1>
-      <p class="welcome-subtitle">I am your assistant, what can I help you?</p>
 
       <div class="quick-prompts">
         <span class="prompt-chip"
@@ -152,12 +151,6 @@ onMounted(async () => {
   font-weight: 600;
   color: #1d2129;
   margin: 0 0 12px 0;
-}
-
-.welcome-subtitle {
-  font-size: 16px;
-  color: #606266;
-  margin: 0 0 24px 0;
 }
 
 .quick-prompts {
