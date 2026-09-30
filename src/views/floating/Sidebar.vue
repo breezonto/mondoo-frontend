@@ -489,11 +489,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import { useRouter }                       from 'vue-router';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
-import { loadFileList }                       from '@/cxtmgr/library';
-import type { FileDesc }                      from "@/cxtmgr/library"
+import { useRouter } from 'vue-router';
+import eventBus      from '@/cxtmgr/eventBus';
+
 import { 
   loadChatHistory, 
   deleteChatHistory, 
@@ -501,57 +501,10 @@ import {
   type HistoryDesc 
 }  from '@/cxtmgr/session';
 
-import eventBus                           from '@/utils/eventBus';
-
-const router           = useRouter();
-
-const rFileList        = ref<FileDesc[]>([]);
-const rMenuList        = ref<Menu[]>([]);
-const rExpandedParents = ref<Set<number>>(new Set());
-
-const menuSections = computed(() => {
-  const parents   = rMenuList.value.filter(m => m.parentId === 0);
-  const children  = rMenuList.value.filter(m => m.parentId && m.parentId > 0);
-  const parentIds = new Set(children.map(c => c.parentId));
-
-  return parents.map(p => {
-    if (parentIds.has(p.id)) {
-      return { 
-        type: 'parent' as const, 
-        ...p, 
-        children: children.filter(c => c.parentId === p.id).sort((a, b) => a.sortOrder - b.sortOrder) 
-      };
-    }
-
-    return { 
-      type: 'leaf' as const, 
-      ...p, 
-      children: [] as Menu[] 
-    };
-  }).sort((a, b) => a.sortOrder - b.sortOrder);
-});
 
 
-const toggleParent = (id: number | undefined) => {
-  if (id === undefined) return;
-  const s = new Set(rExpandedParents.value);
-  if (s.has(id)) s.delete(id); else s.add(id);
-  rExpandedParents.value = s;
-};
 
-const isParentOpen = (id: number | undefined): boolean => {
-  if (id === undefined) return false;
-  return rExpandedParents.value.has(id);
-};
-
-
-interface Menu {
-  id?       : number;
-  parentId? : number;
-  name      : string;
-  path      : string;
-  sortOrder : number;
-}
+const router = useRouter();
 
 const { isOpen } = defineProps<{
   isOpen: boolean;
@@ -566,7 +519,6 @@ const emit = defineEmits<{
 }>();
 
 const rHistoryItems  = ref<HistoryDesc[]>([]);
-const rIsHistoryOpen = ref(false);
 
 const rRenameText         = ref('');
 const rRenamingHistoryIdx = ref<number | null>(null);
@@ -579,11 +531,6 @@ const rContextMenuPosition = ref({
   top: 0,
   left: 0,
 });
-
-const _toggleHistory = () => {
-  rIsHistoryOpen.value = !rIsHistoryOpen.value;
-};
-
 
 const _createNewSession = async () => {
   router.push({path: '/'});
@@ -696,73 +643,9 @@ const _deleteHistory = async (index: number) => {
 }
 
 
-const _loadEntries = async () => {
-  console.log("Loading Menu List");
-
-  try {
-    const response = {
-      data: [
-        // {
-        //   id        : 1,
-        //   parentId  : 0,
-        //   name      : "Library",
-        //   path      : '/library',
-        //   sortOrder : 0
-        // },
-        {
-          id        : 2,
-          parentId  : 0,
-          name      : "Recents",
-          path      : '/history',
-          sortOrder : 1
-        }
-      ]
-    }
-    if (response && response.data) {
-      rMenuList.value = response.data.sort((a: Menu, b: Menu) => {
-        return a.sortOrder - b.sortOrder;
-      });
-    } else {
-      rMenuList.value = [];
-    }
-  } catch (error) {
-    console.error('Failed to Load Sidebar Menu', error);
-    rMenuList.value = [];
-  }
-};
-
-
-const _navigate = (path: string) => {
-  let actualPath      = path;
-  let isMenuDeveloped = true;
-  
-  console.log("Current Path:", path)
-
-  actualPath = path;
-  
-  if (actualPath === '/history') {
-    return _toggleHistory();
-  }
-
-  if (isMenuDeveloped) {
-    router.push({
-      path  : actualPath,
-    });
-    emit('close');
-  }
-};
-
-
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Below event functions /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
-
-
-watch(() => eventBus.fileUploaded.value, async (newValue) => {
-  if (newValue) {
-    rFileList.value = await loadFileList();
-  }
-});
 
 
 watch(() => eventBus.sessionSent.value, async (newValue) => {
@@ -774,7 +657,6 @@ watch(() => eventBus.sessionSent.value, async (newValue) => {
 
 
 onMounted(async () => {
-  _loadEntries();
   rHistoryItems.value = await loadChatHistory();
   
   document.addEventListener('click', _closeHistoryContextMenu)

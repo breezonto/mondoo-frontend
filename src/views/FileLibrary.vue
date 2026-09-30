@@ -104,7 +104,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { getFileList, deleteFile, batchDeleteFiles } from '@/api/file';
 
-import eventBus           from '@/utils/eventBus';
+import eventBus           from '@/cxtmgr/eventBus';
 import FileUploader       from '@/views/floating/FileUploader.vue';
 import SearchBox          from '@/views/gadgets/SearchBox.vue';
 import { formatFileSize } from '@/utils/formatter';

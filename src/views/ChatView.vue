@@ -486,7 +486,7 @@ textarea:focus {
 
 import { ref, watch, nextTick, onMounted } from 'vue';
 
-import eventBus from '@/utils/eventBus';
+import eventBus from '@/cxtmgr/eventBus.ts';
 
 import { generateChatCompletion }          from '@/api/chat.ts';
 import { formatMsgTime, formatMessageContent } from '@/utils/formatter.ts';

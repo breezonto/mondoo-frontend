@@ -89,7 +89,7 @@ import { ref }             from 'vue';
 import { ElMessage }       from 'element-plus';
 import { formatFileSize }  from '@/utils/formatter';
 import { uuidv4 }          from '@/utils/rnd';
-import eventBus            from '@/utils/eventBus';
+import eventBus            from '@/cxtmgr/eventBus';
 
 import { uploadFileSlice, completeUploadFile } from '@/api/file';
 

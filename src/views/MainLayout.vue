@@ -627,9 +627,7 @@ const rIsSidebarOpen = ref(false);
 const rVersion       = ref('');
 
 
-const currentNickname = computed(() => {
-  return "Hero";
-});
+const currentNickname = computed(() => { return "Hero"; });
 
 
 const currentTitle = computed(() => {
