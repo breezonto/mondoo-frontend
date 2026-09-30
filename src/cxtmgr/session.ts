@@ -210,7 +210,8 @@ export class Session {
   public pushMessageToHistory (
     role             : string,
     content          : string
-  ) {  
+  ) {
+    console.log("Push this message!!!!")
     this.currMsgHistoryObj.messages.push(
       {
         role    : role,

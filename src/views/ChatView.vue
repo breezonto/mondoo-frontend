@@ -535,7 +535,7 @@ const rDisplayMessages = ref<DisplayMessage[]>([]);
 const props = defineProps<{
   isLoading        : boolean;
   currQueryMode    : string,
-  currMsgContent   : string,
+  currMessage      : string,
   currMsgHistoryId : string,
 }>();
 
@@ -667,58 +667,59 @@ const _displayStreamingMessage = async (
 /**
  * 
  */
-const _forwardRound = async (currMessage : string) => {
-  // if (!rCurrInputMsg.value) return;
+const _forwardRound = async (currMessage: string) => {
   if (!currMessage) return;
 
-  console.log(
-    // "Current User Query:", rCurrInputMsg.value
-    "Current User Query:", currMessage
-  )
+  console.log("Current User Query:", currMessage);
 
-  // const query_message = rCurrInputMsg.value;
   const query_message = currMessage;
 
   _createBubble(
-    query_message, 
-    ChatRole.user, 
+    query_message,
+    ChatRole.user,
     rCurrQueryMode.value,
     formatMsgTime(new Date())
-  )
-  
+  );
+
   rCurrSession.value?.pushMessageToHistory(
     ChatRole.user,
     query_message
-  )
-
-  // rCurrInputMsg.value = '';
-
-  _createBubble(
-    "", 
-    ChatRole.assistant,
-    rCurrQueryMode.value,
-    formatMsgTime(new Date())
   );
 
-  const response = await generateChatCompletion(
-    rCurrSession.value?.getLatestMsg() || [],
-    rIsStreaming.value,
-    rCurrSession.value?.msgHistoryId
-  );
+  try {
+    const response = await generateChatCompletion(
+      rCurrSession.value?.getLatestMsg() || [],
+      rIsStreaming.value,
+      rCurrSession.value?.msgHistoryId
+    );
 
-  rCurrMsgIdx.value = await _displayStreamingMessage(
-    rCurrMsgIdx.value,
-    rDisplayMessages.value,
-    response
-  )
+    _createBubble(
+      "",
+      ChatRole.assistant,
+      rCurrQueryMode.value,
+      formatMsgTime(new Date())
+    );
 
-  rCurrSession.value?.pushMessageToHistory(
-    ChatRole.assistant,
-    rDisplayMessages.value[rCurrMsgIdx.value].content
-  )
+    rCurrMsgIdx.value = await _displayStreamingMessage(
+      rCurrMsgIdx.value,
+      rDisplayMessages.value,
+      response
+    );
 
-  rIsLoading.value = false;
-  console.log("Message History:", rCurrSession.value?.getFullMsgHistory())
+    rCurrSession.value?.pushMessageToHistory(
+      ChatRole.assistant,
+      rDisplayMessages.value[rCurrMsgIdx.value].content
+    );
+  } catch (err) {
+    _createBubble(
+      "Sorry, something went wrong while generating the response.",
+      ChatRole.assistant,
+      rCurrQueryMode.value,
+      formatMsgTime(new Date())
+    );
+  } finally {
+    rIsLoading.value = false;
+  }
 };
 
 
@@ -774,33 +775,6 @@ const handleClickBubble = (e: MouseEvent) => {
 //////////////////////////// Below event functions /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @TODO comment
- * @param e 
- */
-const onAdjustTextareaHeight = (e: Event) => {
-  const textarea = e.target as HTMLTextAreaElement;
-
-  // Temporarily reset so scrollHeight represents the actual content height
-  textarea.style.height = `${MIN_TEXTAREA_HEIGHT}px`;
-
-  const contentHeight = textarea.scrollHeight;
-
-  // Don't change height until content actually needs more space
-  textareaHeight.value = Math.max(
-    MIN_TEXTAREA_HEIGHT,
-    Math.min(contentHeight, MAX_TEXTAREA_HEIGHT)
-  );
-};
-
-
-/**
- * @TODO comment
- */
-// const onSendMessage = async () => {
-//   await _forwardRound()
-// };
-
 
 /**
  * @TODO comment
@@ -809,19 +783,6 @@ const onAdjustTextareaHeight = (e: Event) => {
 const onClickBubble = (e: MouseEvent) => {
   handleClickBubble(e)
 };
-
-
-/**
- * @TODO comment
- * @param e 
- */
-// const onEnterKeyDown = (e: KeyboardEvent) => {
-  // emit('handleEnterKey', event);
-//   if (e.key === 'Enter' && !e.shiftKey) {
-//     e.preventDefault();
-//     rCurrInputMsg.value.trim() && onSendMessage();
-//   }
-// };
 
 
 /**
@@ -886,7 +847,7 @@ watch(rCurrSession, async () =>
  * @TODO comment
  * @param data: message
  */
-const promptChat = async (
+const startChat = async (
   data: { message: string; queryMode: string } | undefined = undefined,
 ) => {
   console.log("onBeginConversation:", data)
@@ -917,6 +878,6 @@ onMounted(async () => {
   
   _displayMsgHistory();
 
-  promptChat({message: props.currMsgContent, queryMode: props.currQueryMode});
+  startChat({message: props.currMessage, queryMode: props.currQueryMode});
 });
 </script>

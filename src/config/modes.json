@@ -1,13 +1,13 @@
 [
     {
       "modeName"      : "chat",
-      "displayName"   : "conversation with bot",
+      "displayName"   : "",
       "description"   : "chat with LLM chatbot",
       "id"            : "0"
     },
     {
       "modeName"      : "knowledge",
-      "displayName"   : "query to knowledge base",
+      "displayName"   : "",
       "description"   : "search chunks from vector database",
       "id"            : "1"
     }

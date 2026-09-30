@@ -77,52 +77,43 @@ export function saveConfig(interfaceConfig: any[]) {
 
 
 export const generateChatCompletion = async (
-  messageHistory : {role: string, content: string}[],
-  stream         : boolean,
-  context_id     : string | undefined = undefined
-)
-: Promise<Response> => {
-  try {
-    const url = context_id
-      ? `/api/v1/chat/${encodeURIComponent(context_id)}/completions`
-      : `/api/v1/chat/completions`;
-    const response = await fetch(
-      url,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': "application/json",
-        },
-        body: JSON.stringify({
-          model_type: 'remote',
-          messages: messageHistory,
-          context_id: context_id,
-          options: {
-            max_tokens: 1000,
-            temperature: 0.7,
-            top_p: 1.0,
-            top_k: 50,
-            repetition_penalty: 0.0,
-            stop_sequences: ["\n\n"],
-            stream: stream,
-            chunk_size: 5,
-            system_prompt: "You are a helpful assistant.",
-          },
-        }),
-      }
-    );
-   
-    if (!response.ok) { 
-      throw new Error(`HTTP ${response.status}`);
-    }
+  messageHistory: { role: string; content: string }[],
+  stream: boolean,
+  context_id: string | undefined = undefined
+): Promise<Response> => {
+  const url = context_id
+    ? `/api/v1/chat/${encodeURIComponent(context_id)}/completions`
+    : `/api/v1/chat/completions`;
 
-    return response;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model_type: 'remote',
+      messages: messageHistory,
+      context_id: context_id,
+      options: {
+        max_tokens: 1000,
+        temperature: 0.7,
+        top_p: 1.0,
+        top_k: 50,
+        repetition_penalty: 0.0,
+        stop_sequences: ["\n\n"],
+        stream: stream,
+        chunk_size: 5,
+        system_prompt: "You are a helpful assistant.",
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
   }
-  catch (err) {
-    console.error(err);
-    return Response.error()
-  } 
-}
+
+  return response;
+};
 
 
 export const clearChatMessagesInBackend = async (
