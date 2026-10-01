@@ -432,7 +432,7 @@ textarea:focus {
           </div>
           
           <div class="message-content">
-            <div class="bubble" v-html="processedMessages[index]?.content || message.content"
+            <div class="bubble" v-html="rProcessedMessages[index]?.content || message.content"
               @click="onClickBubble" 
             >
             </div>
@@ -514,13 +514,8 @@ const emit = defineEmits<{
   (e: 'openFileLink', fileId: string, fileName: string): void;
 }>();
 
-const chatContainer     = ref<HTMLElement | null>(null);
-const processedMessages = ref<Array<{ content: string }>>([]);
-
-const MIN_TEXTAREA_HEIGHT = 75;
-const MAX_TEXTAREA_HEIGHT = 400;
-
-const textareaHeight = ref(MIN_TEXTAREA_HEIGHT);
+const rChatContainer     = ref<HTMLElement | null>(null);
+const rProcessedMessages = ref<Array<{ content: string }>>([]);
 
 const rCurrSession     = ref<Session>();
 const rCurrMsgIdx      = ref<number>(0);
@@ -730,7 +725,7 @@ const _postProcessMessages = async (displayMessages : DisplayMessage[]) => {
       return { content };
     })
   );
-  processedMessages.value = processed;
+  rProcessedMessages.value = processed;
 };
 
 
@@ -739,8 +734,8 @@ const _postProcessMessages = async (displayMessages : DisplayMessage[]) => {
  */
 const _scrollToBottom = () => {
   nextTick(() => {
-    if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    if (rChatContainer.value) {
+      rChatContainer.value.scrollTop = rChatContainer.value.scrollHeight;
     }
   });
 };

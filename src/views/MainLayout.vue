@@ -110,7 +110,7 @@
 }
 
 /* 用户信息下拉弹窗 */
-.user-info-wrapper {
+.default-wrapper {
   position: relative;
 }
 
@@ -596,10 +596,10 @@
         </div>
         
         <div class="header-right">
-          <div class="user-info-wrapper" ref="userInfoWrapperRef">
+          <div class="default-wrapper" ref="userInfoWrapperRef">
             <span class="default-btn" @click="onOpenLibrary"> Library </span>
           </div>
-          <div class="user-info-wrapper" ref="userInfoWrapperRef">
+          <div class="default-wrapper" ref="userInfoWrapperRef">
             <span class="default-btn" @click="onOpenUserInfoSettings">{{ currentNickname }}</span>
           </div>
         </div>
