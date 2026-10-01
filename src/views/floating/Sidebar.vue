@@ -533,7 +533,7 @@ const rContextMenuPosition = ref({
 });
 
 const _createNewSession = async () => {
-  router.push({name: 'espacio'});
+  router.push({name: 'user-welcome'});
   emit('close');
 };
 
@@ -557,7 +557,7 @@ const _selectHistory = async (index: number) => {
   rCurrHistoryId.value   = history.id;
 
   await router.push({
-    name: 'session',
+    name: 'user-session',
     params: {
       historyId: history.id
     }

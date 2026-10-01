@@ -616,8 +616,9 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-import Sidebar from '@/views/floating/Sidebar.vue';
+
+import { useStore }       from 'vuex';
+import Sidebar            from '@/views/floating/Sidebar.vue';
 import { formatDateTime } from '@/utils/formatter';
 
 const router = useRouter();
@@ -643,7 +644,9 @@ const onOpenUserInfoSettings = () => {
 };
 
 const onOpenLibrary = () => {
-  router.push({path  : '/library'});
+  router.push({
+    name : 'user-library'
+  });
 };
 
 const onCloseSidebar = () => {

@@ -198,7 +198,7 @@ const onCommenceSession = async (
   const newMsgHistoryId = historyIdPrefix + uuidv4();
 
   await router.push({
-    name: 'session',
+    name: 'user-session',
     params: {
       historyId: newMsgHistoryId
     }

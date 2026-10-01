@@ -1,14 +1,14 @@
 [
   {
-    "path": "/",
+    "path": "/user",
     "component": "MainLayout",
     "meta": {
       "requiresAuth": true
     },
     "children": [
       {
-        "path": "espacio",
-        "name": "espacio",
+        "path": "welcome",
+        "name": "user-welcome",
         "component": "Espacio",
         "meta": {
           "title": "Main Page"
@@ -16,19 +16,19 @@
       },
       {
         "path": "session/:historyId",
-        "name": "session",
+        "name": "user-session",
         "component": "Espacio",
         "meta": {
           "title": "Session"
         }
       },
       {
-        "path": "library",
-        "name": "files",
-        "component": "FileLibrary",
-        "meta": {
-          "title": "Library"
-        }
+          "path": "library",
+          "name": "user-library",
+          "component": "FileLibrary",
+          "meta": {
+            "title": "Library"
+          }
       },
       {
         "path": "menu",
@@ -48,8 +48,9 @@
       }
     ]
   },
+
   {
     "path": "",
-    "redirect": "/espacio"
+    "redirect": "/user/welcom"
   }
 ]
