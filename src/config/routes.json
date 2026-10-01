@@ -9,7 +9,7 @@
       {
         "path": "espacio",
         "name": "espacio",
-        "component": "AgentView",
+        "component": "Espacio",
         "meta": {
           "title": "Main Page"
         }
@@ -17,7 +17,7 @@
       {
         "path": "session/:historyId",
         "name": "session",
-        "component": "AgentView",
+        "component": "Espacio",
         "meta": {
           "title": "Session"
         }
@@ -25,7 +25,7 @@
       {
         "path": "library",
         "name": "files",
-        "component": "FileListView",
+        "component": "FileLibrary",
         "meta": {
           "title": "Library"
         }

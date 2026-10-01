@@ -146,7 +146,6 @@ const rPreviewFileName      = ref('');
 const rPreviewContent       = ref('');
 const rPreviewLoading       = ref(false);
 const rCurrentPreviewFileId = ref('');
-const rCurrentMsgIdx        = ref<number | null>(null);
 
 
 ////////////////////////////////////////////////////////////////////////////////////

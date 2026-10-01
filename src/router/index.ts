@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 
 import MainLayout      from '@/views/MainLayout.vue';
-import AgentView       from '@/views/Espacio.vue';
-import FileListView    from '@/views/FileLibrary.vue';
+import Espacio         from '@/views/Espacio.vue';
+import FileLibrary    from '@/views/FileLibrary.vue';
 
 import routeConfig from '@/config/routes.json'
 
 
 const components = {
-  AgentView,
-  FileListView,
+  Espacio,
+  FileLibrary,
   MainLayout
 };
 
