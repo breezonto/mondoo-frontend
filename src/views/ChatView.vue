@@ -457,27 +457,6 @@ textarea:focus {
     <InputBench
       @send-message="_forwardRound"
     />
-    <!--
-    <div class="input-area">
-      <div class="input-wrapper">
-        <textarea 
-              :value="rCurrInputMsg" 
-              @input="(e) => {
-                rCurrInputMsg = (e.target as HTMLTextAreaElement).value;
-                onAdjustTextareaHeight(e);
-              }"
-              placeholder="Typing here..."
-              :style="{ height: textareaHeight + 'px' }">
-        </textarea>
-        <button 
-          class="send-btn" 
-          :disabled="!rCurrInputMsg.trim()" 
-          @keydown.enter="onEnterKeyDown"
-          @click="onSendMessage">Send
-        </button>
-      </div>
-    </div>
-    -->
   </div>
 </template>
 
@@ -767,7 +746,7 @@ const handleClickBubble = (e: MouseEvent) => {
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// Below event functions /////////////////////////////////
+//////////////////////////////// Event functions ///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
 
