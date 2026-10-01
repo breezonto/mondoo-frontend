@@ -85,7 +85,7 @@ export const generateChatCompletion = async (
     ? `/api/v1/chat/${encodeURIComponent(context_id)}/completions`
     : `/api/v1/chat/completions`;
 
-  const response = await fetch(url, {
+  const resp = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -108,11 +108,11 @@ export const generateChatCompletion = async (
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+  if (!resp.ok) {
+    throw new Error(`HTTP ${resp.status}`);
   }
 
-  return response;
+  return resp;
 };
 
 

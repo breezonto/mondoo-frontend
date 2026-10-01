@@ -8,6 +8,7 @@ export interface FileDesc {
   size        : number;
   stage       : string;
   num_chunk   : number;
+  upload_time : string;
 }
 
 
@@ -29,16 +30,9 @@ export const loadFileList = async (
   var fileList : FileDesc[] = [];
   
   try {
-    const keyword   = _keyword?.trim() || undefined;
-    const startDate = _startDate       || undefined;
-    const endDate   = _endDate         || undefined;
-
-    // const response = await getFileList(keyword, startDate, endDate);
-
     fileList = await getFileList();
   } catch (error) {
-    console.error('Failed to Load File List:', error);
-    fileList = [];
+    throw error;
   }
 
   return fileList;

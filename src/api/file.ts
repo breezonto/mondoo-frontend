@@ -7,6 +7,7 @@ export async function uploadFileSlice(
   onProgress?   : (percent: number) => void,
   timeout_in_ms : number = 5_000
 ) {
+
   const sliceSize   = 1024 * 1024; // 1MB
   const totalSlices = Math.ceil(file.size / sliceSize);
 
@@ -22,10 +23,7 @@ export async function uploadFileSlice(
     const startTs = Date.now();
 
     const controller = new AbortController();
-
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, timeout_in_ms);
+    const timeout = setTimeout(() => controller.abort(), timeout_in_ms);
 
     try {
       const resp = await fetch(
@@ -41,25 +39,14 @@ export async function uploadFileSlice(
       );
 
       if (!resp.ok) {
-        throw new Error(
-          `Upload slice ${i} failed: ${resp.status} ${resp.statusText}`
-        );
+        throw new Error(`HTTP ${resp.status}`);
       }
 
       const data = await resp.json();
       onProgress?.(data.percent);
 
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        throw new Error(
-          `Upload slice ${i} timed out after ${timeout_in_ms} ms`
-        );
-      }
-
-      throw err;
-
     } finally {
-      clearTimeout(timeoutId);
+      clearTimeout(timeout);
     }
   }
 
@@ -72,8 +59,10 @@ export async function completeUploadFile(
   meth          : string,
   timeout_in_ms : number = 5_000
 ) {
-  const parse_meth = meth;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeout_in_ms);
 
+  const parse_meth = meth;
   try {
     const resp = await fetch(`/api/v1/files/${fileId}`, {
       method: 'POST',
@@ -90,57 +79,42 @@ export async function completeUploadFile(
     });
 
     if (!resp.ok) {
-      alert("Failed to complete upload");
-      return 'error';
+      throw new Error(`HTTP ${resp.status}`);
     }
 
     const data = await resp.json();
-
     return `Upload complete! File ID: ${data.file_id}`;
 
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'TimeoutError') {
-      alert(`Upload completion timed out after ${timeout_in_ms} ms`);
-      return 'timeout';
-    }
-
-    console.error("Failed to complete upload:", err);
-    alert("Failed to complete upload");
-    return 'error';
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
 
-export async function getFileList(
-  timeout_in_ms : number = 5_000
-) {
+export async function getFileList(timeout_in_ms: number = 5_000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeout_in_ms);
 
   try {
-    const resp = await fetch(`/api/v1/files`, {
+    const resp = await fetch("/api/v1/files", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Accept": "application/json",
       },
-      signal: controller.signal
+      signal: controller.signal,
     });
 
-    const data = await resp.json();
-    return data.views;
-  }
-  catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      console.log("Get File List Timeout");
-    } else {
-      console.log("Get File List Error:", error);
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}`);
     }
-  }
-  finally {
+
+    const data = await resp.json();
+
+    return data.views;
+
+  } finally {
     clearTimeout(timeout);
   }
-
-  return [];
 }
 
 
@@ -168,16 +142,6 @@ export async function deleteFile(
   catch(error) {
 
   }
-}
-
-
-// 更新文件信息
-export function updateFileInfo(fileInfo: any) {
-  return request({
-    url: '/api/updateFile',
-    method: 'put',
-    data: fileInfo,
-  });
 }
 
 

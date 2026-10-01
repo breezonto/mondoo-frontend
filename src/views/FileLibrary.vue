@@ -1,263 +1,3 @@
-<template>
-  <div class="file-library-view">
-    <div class="toolbar-section">
-      <div class="search-section">
-        <SearchBox />
-      </div>
-      
-      <div class="file-import-section">
-        <FileUploader />
-      </div>
-    </div>
-
-    <div class="file-table-container">
-      <div class="batch-bar" v-if="rSelectedFileIds.size > 0">
-        <span class="batch-info"> {{ rSelectedFileIds.size }} Item(s) Selected</span>
-        <button class="batch-delete-btn" @click="onBatchDeleteFiles">Delete in Batch</button>
-        <button class="clear-btn" @click="rSelectedFileIds.clear()">Cancel</button>
-      </div>
-      <div class="file-table-wrapper">
-        <table class="file-table">
-          <thead>
-          <tr>
-            <th class="checkbox-col">
-              <input type="checkbox" :checked="isAllSelected" @change="onSelectAll" />
-            </th>
-            <th>No.</th>
-            <th>File Name</th>
-            <th>Extension</th>
-            <th>File Size</th>
-            <th>
-              Status
-              <span
-                class="info-icon"
-                @click="rShowStageInfoMode = true"
-                style="
-                  display: inline-block;
-                  width: 16px;
-                  height: 16px;
-                  background-color: #f0f0f0;
-                  color: #666;
-                  border-radius: 50%;
-                  text-align: center;
-                  line-height: 16px;
-                  font-size: 12px;
-                  margin-left: 4px;
-                  cursor: pointer;
-                  vertical-align: middle;
-                "
-              >
-                ?
-              </span>
-            </th>
-            <th>Creation Time (UTC+0)</th>
-            <th>Operations</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(file, index) in rFdDisplayList" :key="file.id" :class="{ 'row-selected': rSelectedFileIds.has(file.fileId) }">
-            <td class="checkbox-col" style="text-align: center;">
-              <input type="checkbox" :checked="rSelectedFileIds.has(file.fileId)" @change="onToggleSelect(file.fileId)" />
-            </td>
-            <td>{{ index }}</td>
-            <td>{{ file.stem }}</td>
-            <td>{{ file.ext }}</td>
-            <td>{{ formatFileSize(file.size) }}</td>
-            <td>{{ file.stage }}</td>
-            <td>{{ file.createAt }}</td>
-            <td>
-              <button class="action-btn preview-btn" @click="onPreviewFile(file)">Preview</button>
-              <button class="action-btn edit-btn"    @click="onEditFile(file)">Edit</button>
-              <button class="action-btn delete-btn"  @click="onDeleteFile(file.fileId)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <!-- Parsing Stage Popup -->
-    <div v-if="rShowStageInfoMode" class="preview-modal-overlay" @click="rShowStageInfoMode = false">
-      <div class="preview-modal" style="max-width: 400px;" @click.stop>
-        <div class="preview-header">
-          <h3>Note</h3>
-          <button class="preview-close-btn" @click="rShowStageInfoMode = false">x</button>
-        </div>
-        <div class="preview-content" style="padding: 15px;">
-          <div>
-            <p>The Status of File</p>
-            <ul style="margin-top: 8px; padding-left: 20px; font-size: 13px;">
-              <li>DELTED: The File Is Deleted</li>
-              <li>UPLOADING: The File Is Uploading</li>
-              <li>UPLOADED: The File Is Uploaded</li>
-              <li>PARSERD: The File Is Parsed</li>
-              <li>ARCHIVED: The File Is Archived to Library</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue';
-import { getFileList, deleteFile, batchDeleteFiles } from '@/api/file';
-
-import eventBus           from '@/cxtmgr/eventBus';
-import FileUploader       from '@/views/floating/FileUploader.vue';
-import SearchBox          from '@/views/gadgets/SearchBox.vue';
-import { formatFileSize } from '@/utils/formatter';
-
-interface FdItemInDisplay {
-  id          : number;
-  fileId      : string;
-  sourcePath  : string;
-  targetPath  : string;
-  stem        : string;
-  ext         : string;
-  size        : number;
-  stage       : string;
-  currSlice   : number;
-  totalSlices : number;
-  totalChunks : number;
-  createAt    : string;
-  updateAt    : string;
-}
-
-
-const rFdDisplayList     = ref<FdItemInDisplay[]>([]);
-const rShowEditMode      = ref(false);
-const rShowStageInfoMode = ref(false);
-const rSelectedFileIds   = ref(new Set<string>());
-
-
-const isAllSelected = computed(() => {
-  return rFdDisplayList.value.length > 0 && rFdDisplayList.value.every(f => rSelectedFileIds.value.has(f.fileId));
-});
-
-
-const onToggleSelect = (fileId: string) => {
-  const s = rSelectedFileIds.value;
-  if (s.has(fileId)) {
-    s.delete(fileId);
-  } else {
-    s.add(fileId);
-  }
-
-  rSelectedFileIds.value = new Set(s);
-};
-
-
-const onSelectAll = () => {
-  if (isAllSelected.value) {
-    rSelectedFileIds.value = new Set();
-  } else {
-    rSelectedFileIds.value = new Set(rFdDisplayList.value.map(f => f.fileId));
-  }
-};
-
-
-const onPreviewFile = async (file: FdItemInDisplay) => {
-  console.log("Start to Preview File", file);
-}
-
-
-const onEditFile = (file: FdItemInDisplay) => {
-  console.log("Start to Edit File:", file);
-  rShowEditMode.value = true;
-};
-
-
-const onDeleteFile = async (fileId: string) => {
-  if (confirm('Delete This File?')) {
-    try {
-      const data = await deleteFile(fileId);
-      console.log("Status", data.status)
-      if (data && data.status == 'ok') {
-        alert("File Deleted");
-        await _loadFileList();
-      } else {
-        throw new Error(data.message || "Failed to delete the file");
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to Delete The File, Retry";
-      alert(errorMessage);
-    }
-  }
-};
-
-
-const onBatchDeleteFiles = async () => {
-  const ids = Array.from(rSelectedFileIds.value);
-  if (ids.length === 0) return;
-  if (!confirm(`Delete Selected ${ids.length} File(s)?`)) return;
-  try {
-    const response = await batchDeleteFiles(ids);
-    if (response && response.data && response.data.success) {
-      alert(`Successfully Deleted ${ids.length} Files`);
-      rSelectedFileIds.value = new Set();
-      await _loadFileList();
-      eventBus.triggerFileUploaded();
-    } else {
-      throw new Error(response.data.message || 'Failed to Delete the Batch');
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to Delete the Batch, Please Retry';
-    alert(errorMessage);
-  }
-};
-
-
-const _loadFileList = async () => { 
-  rFdDisplayList.value = []
-
-  try {
-    const fileList = await getFileList();
-    console.log("File List Data:", fileList);
-
-    for (const entry of fileList) {
-      rFdDisplayList.value.push({
-          id          : 0,
-          fileId      : entry.file_id,
-          sourcePath  : '',
-          targetPath  : '',
-          stem        : entry.filename,
-          ext         : entry.type,
-          size        : entry.size,
-          stage       : entry.stage,
-          currSlice   : 1,
-          totalSlices : 1,
-          totalChunks : entry.num_chunk,
-          createAt    : entry.upload_time,
-          updateAt    : ''
-      });
-    }
-  }
-  catch (error) {
-    console.error('Failed to Load File List', error);
-  }
-};
-
-
-onMounted(async () => {
-  try {
-    console.log("!!!!");
-    await _loadFileList();
-  } catch (error) {
-    console.error('Call loadFileList Failed:', error);
-  }
-  
-  watch(() => eventBus.fileUploaded.value, (newValue: boolean) => {
-    if (newValue) {
-      _loadFileList();
-    }
-  });
-
-});
-
-</script>
-
 <style scoped>
 .file-library-view {
   width: 100%;
@@ -644,3 +384,264 @@ onMounted(async () => {
 }
 
 </style>
+
+<template>
+  <div class="file-library-view">
+    <div class="toolbar-section">
+      <div class="search-section">
+        <SearchBox />
+      </div>
+      
+      <div class="file-import-section">
+        <FileUploader />
+      </div>
+    </div>
+
+    <div class="file-table-container">
+      <div class="batch-bar" v-if="rSelectedFileIds.size > 0">
+        <span class="batch-info"> {{ rSelectedFileIds.size }} Item(s) Selected</span>
+        <button class="batch-delete-btn" @click="onBatchDeleteFiles">Delete in Batch</button>
+        <button class="clear-btn" @click="rSelectedFileIds.clear()">Cancel</button>
+      </div>
+      <div class="file-table-wrapper">
+        <table class="file-table">
+          <thead>
+          <tr>
+            <th class="checkbox-col">
+              <input type="checkbox" :checked="isAllSelected" @change="onSelectAll" />
+            </th>
+            <th>No.</th>
+            <th>File Name</th>
+            <th>Extension</th>
+            <th>File Size</th>
+            <th>
+              Status
+              <span
+                class="info-icon"
+                @click="rShowStageInfoMode = true"
+                style="
+                  display: inline-block;
+                  width: 16px;
+                  height: 16px;
+                  background-color: #f0f0f0;
+                  color: #666;
+                  border-radius: 50%;
+                  text-align: center;
+                  line-height: 16px;
+                  font-size: 12px;
+                  margin-left: 4px;
+                  cursor: pointer;
+                  vertical-align: middle;
+                "
+              >
+                ?
+              </span>
+            </th>
+            <th>Creation Time (UTC+0)</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(file, index) in rFdDisplayList" :key="file.id" :class="{ 'row-selected': rSelectedFileIds.has(file.fileId) }">
+            <td class="checkbox-col" style="text-align: center;">
+              <input type="checkbox" :checked="rSelectedFileIds.has(file.fileId)" @change="onToggleSelect(file.fileId)" />
+            </td>
+            <td>{{ index }}</td>
+            <td>{{ file.stem }}</td>
+            <td>{{ file.ext }}</td>
+            <td>{{ formatFileSize(file.size) }}</td>
+            <td>{{ file.stage }}</td>
+            <td>{{ file.createAt }}</td>
+            <td>
+              <button class="action-btn preview-btn" @click="onPreviewFile(file)">Preview</button>
+              <button class="action-btn edit-btn"    @click="onEditFile(file)">Edit</button>
+              <button class="action-btn delete-btn"  @click="onDeleteFile(file.fileId)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Parsing Stage Popup -->
+    <div v-if="rShowStageInfoMode" class="preview-modal-overlay" @click="rShowStageInfoMode = false">
+      <div class="preview-modal" style="max-width: 400px;" @click.stop>
+        <div class="preview-header">
+          <h3>Note</h3>
+          <button class="preview-close-btn" @click="rShowStageInfoMode = false">x</button>
+        </div>
+        <div class="preview-content" style="padding: 15px;">
+          <div>
+            <p>The Status of File</p>
+            <ul style="margin-top: 8px; padding-left: 20px; font-size: 13px;">
+              <li>DELTED: The File Is Deleted</li>
+              <li>UPLOADING: The File Is Uploading</li>
+              <li>UPLOADED: The File Is Uploaded</li>
+              <li>PARSERD: The File Is Parsed</li>
+              <li>ARCHIVED: The File Is Archived to Library</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, watch, computed } from 'vue';
+import { getFileList, deleteFile, batchDeleteFiles } from '@/api/file';
+
+import { loadFileList }   from '@/cxtmgr/library';
+import eventBus           from '@/cxtmgr/eventBus';
+import FileUploader       from '@/views/floating/FileUploader.vue';
+import SearchBox          from '@/views/gadgets/SearchBox.vue';
+import { formatFileSize } from '@/utils/formatter';
+
+interface FdItemInDisplay {
+  id          : number;
+  fileId      : string;
+  sourcePath  : string;
+  targetPath  : string;
+  stem        : string;
+  ext         : string;
+  size        : number;
+  stage       : string;
+  currSlice   : number;
+  totalSlices : number;
+  totalChunks : number;
+  createAt    : string;
+  updateAt    : string;
+}
+
+
+const rFdDisplayList     = ref<FdItemInDisplay[]>([]);
+const rShowEditMode      = ref(false);
+const rShowStageInfoMode = ref(false);
+const rSelectedFileIds   = ref(new Set<string>());
+
+
+const isAllSelected = computed(() => {
+  return rFdDisplayList.value.length > 0 && rFdDisplayList.value.every(f => rSelectedFileIds.value.has(f.fileId));
+});
+
+
+const onToggleSelect = (fileId: string) => {
+  const s = rSelectedFileIds.value;
+  if (s.has(fileId)) {
+    s.delete(fileId);
+  } else {
+    s.add(fileId);
+  }
+
+  rSelectedFileIds.value = new Set(s);
+};
+
+
+const onSelectAll = () => {
+  if (isAllSelected.value) {
+    rSelectedFileIds.value = new Set();
+  } else {
+    rSelectedFileIds.value = new Set(rFdDisplayList.value.map(f => f.fileId));
+  }
+};
+
+
+const onPreviewFile = async (file: FdItemInDisplay) => {
+  console.log("Start to Preview File", file);
+}
+
+
+const onEditFile = (file: FdItemInDisplay) => {
+  console.log("Start to Edit File:", file);
+  rShowEditMode.value = true;
+};
+
+
+const onDeleteFile = async (fileId: string) => {
+  if (confirm('Delete This File?')) {
+    try {
+      const data = await deleteFile(fileId);
+      console.log("Status", data.status)
+      if (data && data.status == 'ok') {
+        alert("File Deleted");
+        await _loadFileList();
+      } else {
+        throw new Error(data.message || "Failed to delete the file");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to Delete The File, Retry";
+      alert(errorMessage);
+    }
+  }
+};
+
+
+const onBatchDeleteFiles = async () => {
+  const ids = Array.from(rSelectedFileIds.value);
+  if (ids.length === 0) return;
+  if (!confirm(`Delete Selected ${ids.length} File(s)?`)) return;
+  try {
+    const response = await batchDeleteFiles(ids);
+    if (response && response.data && response.data.success) {
+      alert(`Successfully Deleted ${ids.length} Files`);
+      rSelectedFileIds.value = new Set();
+      await _loadFileList();
+      eventBus.triggerFileUploaded();
+    } else {
+      throw new Error(response.data.message || 'Failed to Delete the Batch');
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to Delete the Batch, Please Retry';
+    alert(errorMessage);
+  }
+};
+
+
+const _loadFileList = async () => { 
+  rFdDisplayList.value = []
+
+  try {
+    const fileList = await loadFileList();
+    console.log("File List Data:", fileList);
+
+    for (const entry of fileList) {
+      rFdDisplayList.value.push({
+          id          : 0,
+          fileId      : entry.file_id,
+          sourcePath  : '',
+          targetPath  : '',
+          stem        : entry.filename,
+          ext         : entry.type,
+          size        : entry.size,
+          stage       : entry.stage,
+          currSlice   : 1,
+          totalSlices : 1,
+          totalChunks : entry.num_chunk,
+          createAt    : entry.upload_time,
+          updateAt    : ''
+      });
+    }
+  }
+  catch (error) {
+    console.error(error);
+  }
+};
+
+
+onMounted(async () => {
+  try {
+    console.log("!!!!");
+    await _loadFileList();
+  } catch (error) {
+    console.error('Call loadFileList Failed:', error);
+  }
+  
+  watch(() => eventBus.fileUploaded.value, (newValue: boolean) => {
+    if (newValue) {
+      _loadFileList();
+    }
+  });
+
+});
+
+</script>
