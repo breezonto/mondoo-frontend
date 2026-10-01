@@ -1,125 +1,3 @@
-<template>
-  <div class="welcome-container">
-    <div class="welcome-content">
-      <h1 class="welcome-title">Mondooooo</h1>
-
-      <div class="quick-prompts">
-        <span class="prompt-chip"
-          v-for="(prompt, index) in promptRecommendation"
-          :key="index"
-          @click="selectQuickPrompt(prompt)"
-        >
-        {{ prompt }}
-        </span>
-      </div>
-
-      <div class="input-area">
-        <textarea 
-          v-model="inputMessage" 
-          @input="onTextInput"
-          @keydown.enter="onEnterKey"
-          placeholder="Typing here..."
-          :style="{ height: textareaHeight + 'px' }"
-        >
-        </textarea>
-        <button class="send-btn" 
-            :disabled="!inputMessage.trim()"
-            @click="onButtonClick">
-            Send
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import type { QueryMode } from '@/cxtmgr/session';
-import { loadQueryModes } from '@/cxtmgr/session';
-
-const emit = defineEmits<{
-  (e: 'start', data: { message: string; queryMode: string }): void;
-}>();
-
-
-const inputMessage      = ref('');
-const modeName          = ref('chat');
-const chatModes         = ref<QueryMode[]>([]);
-const textareaHeight    = ref(60);
-const maxTextareaHeight = 200;
-
-
-const promptRecommendation = [
-  "What are there documents recently?",
-  "What files are uploaded by this week?",
-  "What you can do for me?",
-  "How to upload files?",
-  "What\'s the weather today?"
-];
-
-
-const selectQuickPrompt = (prompt: string) => {
-  inputMessage.value = prompt;
-  handleStartChat();
-};
-
-
-const handleStartChat = () => {
-  const content = inputMessage.value.trim();
-  if (!content) return;
-
-  emit('start', {
-    message: content,
-    queryMode: modeName.value
-  });
-};
-
-
-////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// Below event functions /////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-
-
-/**
- * 
- * @param event 
- */
-const onEnterKey = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    if (inputMessage.value.trim()) {
-      handleStartChat();
-    }
-  }
-};
-
-/**
- * 
- */
-const onButtonClick = () => {
-  handleStartChat();
-};
-
-/**
- * 
- * @param event 
- */
-const onTextInput = (event: Event) => {
-  const textarea        = event.target as HTMLTextAreaElement;
-  textarea.style.height = 'auto';
-  const scrollHeight    = textarea.scrollHeight;
-  textareaHeight.value  = Math.min(scrollHeight, maxTextareaHeight);
-};
-
-
-onMounted(async () => {
-  console.log("WelcomeView Mounted!");
-  chatModes.value = await loadQueryModes();
-});
-
-</script>
-
-
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// css style config ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -291,3 +169,124 @@ textarea:focus {
 
 
 </style>
+
+<template>
+  <div class="welcome-container">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Mondooooo</h1>
+
+      <div class="quick-prompts">
+        <span class="prompt-chip"
+          v-for="(prompt, index) in promptRecommendation"
+          :key="index"
+          @click="selectQuickPrompt(prompt)"
+        >
+        {{ prompt }}
+        </span>
+      </div>
+
+      <div class="input-area">
+        <textarea 
+          v-model="inputMessage" 
+          @input="onTextInput"
+          @keydown.enter="onEnterKey"
+          placeholder="Typing here..."
+          :style="{ height: textareaHeight + 'px' }"
+        >
+        </textarea>
+        <button class="send-btn" 
+            :disabled="!inputMessage.trim()"
+            @click="onButtonClick">
+            Send
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import type { QueryMode } from '@/cxtmgr/session';
+import { loadQueryModes } from '@/cxtmgr/session';
+
+const emit = defineEmits<{
+  (e: 'start', data: { message: string; queryMode: string }): void;
+}>();
+
+
+const inputMessage      = ref('');
+const modeName          = ref('chat');
+const chatModes         = ref<QueryMode[]>([]);
+const textareaHeight    = ref(60);
+const maxTextareaHeight = 200;
+
+
+const promptRecommendation = [
+  "What are there documents recently?",
+  "What files are uploaded by this week?",
+  "What you can do for me?",
+  "How to upload files?",
+  "What\'s the weather today?"
+];
+
+
+const selectQuickPrompt = (prompt: string) => {
+  inputMessage.value = prompt;
+  handleStartChat();
+};
+
+
+const handleStartChat = () => {
+  const content = inputMessage.value.trim();
+  if (!content) return;
+
+  emit('start', {
+    message: content,
+    queryMode: modeName.value
+  });
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////// Below event functions /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * 
+ * @param event 
+ */
+const onEnterKey = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    if (inputMessage.value.trim()) {
+      handleStartChat();
+    }
+  }
+};
+
+/**
+ * 
+ */
+const onButtonClick = () => {
+  handleStartChat();
+};
+
+/**
+ * 
+ * @param event 
+ */
+const onTextInput = (event: Event) => {
+  const textarea        = event.target as HTMLTextAreaElement;
+  textarea.style.height = 'auto';
+  const scrollHeight    = textarea.scrollHeight;
+  textareaHeight.value  = Math.min(scrollHeight, maxTextareaHeight);
+};
+
+
+onMounted(async () => {
+  console.log("WelcomeView Mounted!");
+  chatModes.value = await loadQueryModes();
+});
+
+</script>

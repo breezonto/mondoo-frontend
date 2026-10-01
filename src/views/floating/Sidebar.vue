@@ -533,12 +533,12 @@ const rContextMenuPosition = ref({
 });
 
 const _createNewSession = async () => {
-  router.push({path: '/'});
+  router.push({name: 'espacio'});
   emit('close');
 };
 
 
-const _selectHistory = (index: number) => {
+const _selectHistory = async (index: number) => {
   if (index < 0 || index >= rHistoryItems.value.length) {
     return;
   }
@@ -554,12 +554,12 @@ const _selectHistory = (index: number) => {
   }
   
   rCurrHistoryItem.value = history;
-  rCurrHistoryId.value     = history.id;
+  rCurrHistoryId.value   = history.id;
 
-  router.push({
-    path: '/',
-    query: { 
-      historyId : history.id 
+  await router.push({
+    name: 'session',
+    params: {
+      historyId: history.id
     }
   });
   

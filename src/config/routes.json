@@ -2,39 +2,45 @@
   {
     "path": "/",
     "component": "MainLayout",
-    "meta": { "requiresAuth": true },
-
+    "meta": {
+      "requiresAuth": true
+    },
     "children": [
       {
-        "path": "/espacio",
+        "path": "espacio",
         "name": "espacio",
         "component": "AgentView",
         "meta": {
           "title": "Main Page"
         }
       },
-
       {
-        "path": "/library",
+        "path": "session/:historyId",
+        "name": "session",
+        "component": "AgentView",
+        "meta": {
+          "title": "Session"
+        }
+      },
+      {
+        "path": "library",
         "name": "files",
         "component": "FileListView",
         "meta": {
           "title": "Library"
         }
       },
-
       {
-        "path": "/menu",
+        "path": "menu",
         "name": "menu",
         "component": "MenuListView",
         "meta": {
           "title": "Menu"
         }
       },
-
       {
-        "path": "/history/manage",
-        "name": "message history",
+        "path": "history/manage",
+        "name": "message-history",
         "component": "HistoryListView",
         "meta": {
           "title": "Message History"

@@ -192,18 +192,18 @@ const _closePreviewModal = () => {
  */
 const onCommenceQuest = async (
   data: { message: string; queryMode: string }
-) => {  
-  rCurrQueryMode.value  = data.queryMode;
+) => {
+  rCurrQueryMode.value = data.queryMode;
   rCurrMessage.value = data.message;
-  
+
   const newMsgHistoryId = historyIdPrefix + uuidv4();
 
   console.log("Set Current history ID (inicio):", newMsgHistoryId);
   console.log("On Commence Quest:", data);
 
   await router.push({
-    path: '/',
-    query: {
+    name: 'session',
+    params: {
       historyId: newMsgHistoryId
     }
   });
@@ -225,35 +225,35 @@ const onOpenFileLink = async (
 /**
  * watch the change of URL and reload 
  */
-watch(() => route.query, async () => 
-{
-  const historyId = route.query.historyId as string;
+// watch(() => route.query, async () => 
+// {
+//   const historyId = route.query.historyId as string;
 
-  rCurrentMsgIdx.value = null;
-  rIsLoading.value     = false;
+//   rCurrentMsgIdx.value = null;
+//   rIsLoading.value     = false;
   
-  await _mutateQueryParams(historyId)
+//   await _mutateQueryParams(historyId)
 
-}, { deep: true, immediate: true }
-);
+// }, { deep: true, immediate: true }
+// );
 
 
-watch(() => route.path, async (newPath, oldPath) => 
-{
-  console.log(
-    "route.path watcher fired (watch route.path)",
-    new Date().toISOString(),
-    "old:", oldPath,
-    "new:", newPath
-  );
-}
+watch(
+  () => route.params.historyId,
+  async (newHistoryId, oldHistoryId) => {
+    console.log("History ID watcher fired");
+    console.log("old:", oldHistoryId);
+    console.log("new:", newHistoryId);
+
+    await _mutateQueryParams(newHistoryId as string);
+  }
 );
 
 /**
  * @TODO comment
  */
 onMounted(async () => {
-  console.log("Agent View Mounted!", new Date().toISOString());
+  console.log("Espacio Mounted!", new Date().toISOString());
 
   const historyId = route.query.historyId as string;
   await _mutateQueryParams(historyId);
