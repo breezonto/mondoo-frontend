@@ -90,7 +90,7 @@
 <template>
   <div class="agent-container">
     <WelcomeView v-if="rShowWelcome" 
-      @start="onCommenceQuest"
+      @start="onCommenceSession"
     />
     <!-- Chat Session -->
     <ChatView v-else
@@ -102,11 +102,11 @@
     />
 
     <!-- File Preview Popup -->
-    <div v-if="rIsShowingPreview" class="preview-modal-overlay" @click="_closePreviewModal">
+    <div v-if="rIsShowingPreview" class="preview-modal-overlay" @click="_closePreview">
       <div class="preview-modal" @click.stop>
         <div class="preview-header">
           <h3>{{ rPreviewFileName }}</h3>
-          <button class="preview-close-btn" @click="_closePreviewModal">x</button>
+          <button class="preview-close-btn" @click="_closePreview">x</button>
         </div>
         <div class="preview-content">
           <div v-if="rPreviewLoading" class="preview-loading">Lading...</div>
@@ -155,7 +155,7 @@ const rCurrentPreviewFileId = ref('');
 const historyIdPrefix   : string = "cmh-";
 
 
-const _mutateQueryParams = async (
+const _mutate = async (
   rscId : string
 ) => {
   if (rscId !== undefined && rscId !== null) {
@@ -173,7 +173,7 @@ const _mutateQueryParams = async (
 
 
 
-const _closePreviewModal = () => {
+const _closePreview = () => {
   rIsShowingPreview.value     = false;
   rPreviewContent.value       = '';
   rCurrentPreviewFileId.value = '';
@@ -189,16 +189,13 @@ const _closePreviewModal = () => {
  * trigger this event if click the "send" or press Enter in keyboard
  * @param data: message
  */
-const onCommenceQuest = async (
+const onCommenceSession = async (
   data: { message: string; queryMode: string }
 ) => {
   rCurrQueryMode.value = data.queryMode;
   rCurrMessage.value = data.message;
 
   const newMsgHistoryId = historyIdPrefix + uuidv4();
-
-  console.log("Set Current history ID (inicio):", newMsgHistoryId);
-  console.log("On Commence Quest:", data);
 
   await router.push({
     name: 'session',
@@ -217,24 +214,7 @@ const onCommenceQuest = async (
 const onOpenFileLink = async (
   fileId   : string, 
   fileName : string
-) => {
-};
-
-
-/**
- * watch the change of URL and reload 
- */
-// watch(() => route.query, async () => 
-// {
-//   const historyId = route.query.historyId as string;
-
-//   rCurrentMsgIdx.value = null;
-//   rIsLoading.value     = false;
-  
-//   await _mutateQueryParams(historyId)
-
-// }, { deep: true, immediate: true }
-// );
+) => {};
 
 
 watch(
@@ -244,7 +224,7 @@ watch(
     console.log("old:", oldHistoryId);
     console.log("new:", newHistoryId);
 
-    await _mutateQueryParams(newHistoryId as string);
+    await _mutate(newHistoryId as string);
   }
 );
 
@@ -255,7 +235,7 @@ onMounted(async () => {
   console.log("Espacio Mounted!", new Date().toISOString());
 
   const historyId = route.query.historyId as string;
-  await _mutateQueryParams(historyId);
+  await _mutate(historyId);
 });
 
 
